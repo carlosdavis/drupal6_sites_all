@@ -1,5 +1,5 @@
 <?php
-// $Id: wysiwyg.install,v 1.3 2008/11/03 23:57:40 sun Exp $
+// $Id: wysiwyg.install,v 1.4 2009/06/08 21:57:10 sun Exp $
 
 /**
  * Implementation of hook_schema().
@@ -23,8 +23,6 @@ function wysiwyg_schema() {
  */
 function wysiwyg_install() {
   drupal_install_schema('wysiwyg');
-  // Import settings from old editor modules.
-  wysiwyg_migrate_tinymce();
 }
 
 /**
@@ -35,39 +33,34 @@ function wysiwyg_uninstall() {
 }
 
 /**
- * Migrate from TinyMCE.
+ * Implementation of hook_enable().
  */
-function wysiwyg_migrate_tinymce() {
-  if (db_table_exists('tinymce_settings')) {
-    $schema = db_result(db_query("SELECT schema_version FROM {system} WHERE name = 'tinymce'"));
-    if ($schema >= 1) {
-      // Migrate profile configurations.
-      $profiles = db_query("SELECT settings FROM {tinymce_settings}");
-      while ($profile = db_fetch_array($profiles)) {
-        $settings = unserialize($profile['settings']);
-        // Convert buttons/plugins into an associative array.
-        $old_buttons = (isset($settings['buttons']) ? $settings['buttons'] : array());
-        $settings['buttons'] = array();
-        foreach ($old_buttons as $old_button => $enabled) {
-          list($plugin, $button) = explode('-', $old_button, 2);
-          $settings['buttons'][$plugin][$button] = 1;
-        }
-        foreach (_wysiwyg_install_get_formats() as $format => $name) {
-          // We can't use update_sql() here because of curly braces in serialized
-          // array.
-          db_query("INSERT INTO {wysiwyg} (format, editor, settings) VALUES (%d, 'tinymce', '%s')", $format, serialize($settings));
-        }
-        // We can only migrate one profile.
-        break;
-      }
-      // Disable TinyMCE module.
-      module_disable(array('tinymce'));
-      drupal_set_message('TinyMCE module can be safely uninstalled now.');
-    }
-    else {
-      drupal_set_message('To migrate your existing TinyMCE settings to Wysiwyg Editor, please update TinyMCE module to the latest official release, and re-install Wysiwyg Editor module.');
-    }
-  }
+function wysiwyg_enable() {
+  // Disable conflicting, obsolete editor integration modules whenever this
+  // module is enabled. This is crude, but the only way to ensure no conflicts.
+  module_disable(array(
+    'editarea',
+    'editonpro',
+    'editor',
+    'fckeditor',
+    'freerte',
+    'htmlarea',
+    'htmlbox',
+    'jwysiwyg',
+    'markitup',
+    'nicedit',
+    'openwysiwyg',
+    'pegoeditor',
+    'quicktext',
+    'tinymce',
+    'tinymce_autoconf',
+    'tinytinymce',
+    'whizzywig',
+    'widgeditor',
+    'wymeditor',
+    'xstandard',
+    'yui_editor',
+  ));
 }
 
 /**

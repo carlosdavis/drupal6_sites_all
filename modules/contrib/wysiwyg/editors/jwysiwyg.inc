@@ -1,17 +1,19 @@
 <?php
-// $Id: jwysiwyg.inc,v 1.2 2008/10/29 10:13:15 sun Exp $
+// $Id: jwysiwyg.inc,v 1.4 2009/06/09 00:18:11 sun Exp $
 
+/**
+ * @file
+ * Editor integration functions for jWYSIWYG.
+ */
 
 /**
  * Plugin implementation of hook_editor().
  */
 function wysiwyg_jwysiwyg_editor() {
-  $editor = array();
   $editor['jwysiwyg'] = array(
     'title' => 'jWYSIWYG',
     'vendor url' => 'http://code.google.com/p/jwysiwyg/',
     'download url' => 'http://code.google.com/p/jwysiwyg/downloads/list',
-    'library path' => wysiwyg_get_path('jwysiwyg'),
     'libraries' => array(
       '' => array(
         'title' => 'Source',
@@ -23,6 +25,7 @@ function wysiwyg_jwysiwyg_editor() {
       ),
     ),
     'version callback' => 'wysiwyg_jwysiwyg_version',
+    // @todo Wrong property; add separate properties for editor requisites.
     'css path' => wysiwyg_get_path('jwysiwyg'),
     'versions' => array(
       '0.5' => array(
@@ -44,7 +47,7 @@ function wysiwyg_jwysiwyg_editor() {
  *   The installed editor version.
  */
 function wysiwyg_jwysiwyg_version($editor) {
-  $script = wysiwyg_get_path('jwysiwyg') . '/jquery.wysiwyg.js';
+  $script = $editor['library path'] . '/jquery.wysiwyg.js';
   $script = fopen($script, 'r');
   fgets($script);
   $line = fgets($script);
@@ -52,5 +55,6 @@ function wysiwyg_jwysiwyg_version($editor) {
     fclose($script);
     return $version[1];
   }
+  fclose($script);
 }
 

@@ -1,22 +1,19 @@
 <?php
-// $Id: fckeditor.inc,v 1.12 2009/03/21 23:16:15 sun Exp $
+// $Id: fckeditor.inc,v 1.17 2009/06/09 00:18:11 sun Exp $
 
 /**
  * @file
  * Editor integration functions for FCKeditor.
  */
 
-
 /**
  * Plugin implementation of hook_editor().
  */
 function wysiwyg_fckeditor_editor() {
-  $editor = array();
   $editor['fckeditor'] = array(
     'title' => 'FCKeditor',
     'vendor url' => 'http://www.fckeditor.net',
     'download url' => 'http://www.fckeditor.net/download',
-    'library path' => wysiwyg_get_path('fckeditor'),
     'libraries' => array(
       '' => array(
         'title' => 'Default',
@@ -36,7 +33,7 @@ function wysiwyg_fckeditor_editor() {
     ),
     'proxy plugin settings callback' => 'wysiwyg_fckeditor_proxy_plugin_settings',
     'versions' => array(
-      2.6 => array(
+      '2.6' => array(
         'js files' => array('fckeditor-2.6.js'),
       ),
     ),
@@ -54,7 +51,7 @@ function wysiwyg_fckeditor_editor() {
  *   The installed editor version.
  */
 function wysiwyg_fckeditor_version($editor) {
-  $library = $editor['library path'] .'/fckeditor.js';
+  $library = $editor['library path'] . '/fckeditor.js';
   $library = fopen($library, 'r');
   $max_lines = 100;
   while ($max_lines && $line = fgets($library, 60)) {
@@ -65,6 +62,22 @@ function wysiwyg_fckeditor_version($editor) {
     $max_lines--;
   }
   fclose($library);
+}
+
+/**
+ * Determine available editor themes or check/reset a given one.
+ *
+ * @param $editor
+ *   A processed hook_editor() array of editor properties.
+ * @param $profile
+ *   A wysiwyg editor profile.
+ *
+ * @return
+ *   An array of theme names. The first returned name should be the default
+ *   theme name.
+ */
+function wysiwyg_fckeditor_themes($editor, $profile) {
+  return array('default', 'office2003', 'silver');
 }
 
 /**
@@ -83,8 +96,9 @@ function wysiwyg_fckeditor_version($editor) {
  */
 function wysiwyg_fckeditor_settings($editor, $config, $theme) {
   $settings = array(
-    'EditorPath' => base_path() . $editor['library path'] .'/',
-    'SkinPath' => base_path() . $editor['library path'] .'/editor/skins/'. $theme .'/',
+    'EditorPath' => base_path() . $editor['library path'] . '/',
+    'SkinPath' => base_path() . $editor['library path'] . '/editor/skins/' . $theme . '/',
+    'CustomConfigurationsPath' => base_path() . drupal_get_path('module', 'wysiwyg') . '/editors/js/fckeditor.config.js',
     'Width' => '100%',
     'Height' => 420,
     'LinkBrowser' => FALSE,
@@ -93,6 +107,13 @@ function wysiwyg_fckeditor_settings($editor, $config, $theme) {
     'ImageUpload' => FALSE,
     'FlashBrowser' => FALSE,
     'FlashUpload' => FALSE,
+    // By default, FCKeditor converts most characters into HTML entities. Since
+    // it does not support a custom definition, but Drupal supports Unicode, we
+    // disable at least the additional character sets. FCKeditor always converts
+    // XML default characters '&', '<', '>'.
+    // @todo Check whether completely disabling ProcessHTMLEntities is an option.
+    'IncludeLatinEntities' => FALSE,
+    'IncludeGreekEntities' => FALSE,
   );
   if (isset($config['block_formats'])) {
     $settings['FontFormats'] = strtr($config['block_formats'], array(',' => ';'));
@@ -115,7 +136,6 @@ function wysiwyg_fckeditor_settings($editor, $config, $theme) {
 
   if (!empty($config['buttons'])) {
     // Use our custom toolbar set.
-    $settings['CustomConfigurationsPath'] = wysiwyg_get_path('editors/js/fckeditor.config.js', TRUE);
     $settings['ToolbarSet'] = 'Wysiwyg';
     // Populate our custom toolbar set for fckeditor.config.js.
     $settings['buttons'] = array();
@@ -149,29 +169,23 @@ function wysiwyg_fckeditor_settings($editor, $config, $theme) {
 }
 
 /**
- * Determine available editor themes or check/reset a given one.
- *
- * @param $editor
- *   A processed hook_editor() array of editor properties.
- * @param $profile
- *   A wysiwyg editor profile.
- *
- * @return
- *   An array of theme names. The first returned name should be the default
- *   theme name.
- */
-function wysiwyg_fckeditor_themes($editor, $profile) {
-  return array('default', 'office2003', 'silver');
-}
-
-/**
  * Build a JS settings array of native external plugins that need to be loaded separately.
- *
- * @todo Required for FCKeditor?  If not, wysiwyg_add_plugin_settings() needs
- *   an overhaul.
  */
 function wysiwyg_fckeditor_plugin_settings($editor, $profile, $plugins) {
   $settings = array();
+  foreach ($plugins as $name => $plugin) {
+    // Register all plugins that need to be loaded.
+    if (!empty($plugin['load'])) {
+      $settings[$name] = array();
+      // Add path for native external plugins; internal ones do not need a path.
+      if (empty($plugin['internal']) && isset($plugin['path'])) {
+        $settings[$name]['path'] = base_path() . $plugin['path'];
+      }
+      if (!empty($plugin['languages'])) {
+        $settings[$name]['languages'] = $plugin['languages'];
+      }
+    }
+  }
   return $settings;
 }
 
@@ -184,20 +198,20 @@ function wysiwyg_fckeditor_proxy_plugin_settings($editor, $profile, $plugins) {
     // Populate required plugin settings.
     $settings[$name] = $plugin['dialog settings'] + array(
       'title' => $plugin['title'],
-      'icon' => base_path() . $plugin['icon path'] .'/'. $plugin['icon file'],
+      'icon' => base_path() . $plugin['icon path'] . '/' . $plugin['icon file'],
       'iconTitle' => $plugin['icon title'],
       // @todo These should only be set if the plugin defined them.
-      'css' => base_path() . $plugin['css path'] .'/'. $plugin['css file'],
+      'css' => base_path() . $plugin['css path'] . '/' . $plugin['css file'],
     );
   }
   return $settings;
 }
 
 /**
- * Return internal plugins for FCKeditor; semi-implementation of hook_wysiwyg_plugin().
+ * Return internal plugins for this editor; semi-implementation of hook_wysiwyg_plugin().
  */
 function wysiwyg_fckeditor_plugins($editor) {
-  return array(
+  $plugins = array(
     'default' => array(
       'buttons' => array(
         'Bold' => t('Bold'), 'Italic' => t('Italic'), 'Underline' => t('Underline'),
@@ -218,7 +232,6 @@ function wysiwyg_fckeditor_plugins($editor) {
         'RemoveFormat' => t('Remove format'),
         'SpecialChar' => t('Character map'),
         'About' => t('About'),
-
         'FontFormat' => t('HTML block format'), 'FontName' => t('Font'), 'FontSize' => t('Font size'), 'Style' => t('Font style'),
         'Table' => t('Table'),
         'Find' => t('Search'), 'Replace' => t('Replace'), 'SelectAll' => t('Select all'),
@@ -229,6 +242,50 @@ function wysiwyg_fckeditor_plugins($editor) {
       ),
       'internal' => TRUE,
     ),
+    'autogrow' => array(
+      'path' => $editor['library path'] . '/editor/plugins',
+      'extensions' => array(
+        'autogrow' => t('Autogrow'),
+      ),
+      'options' => array(
+        'AutoGrowMax' => 800,
+      ),
+      'internal' => TRUE,
+      'load' => TRUE,
+    ),
+    'bbcode' => array(
+      'path' => $editor['library path'] . '/editor/plugins',
+      'extensions' => array(
+        'bbcode' => t('BBCode'),
+      ),
+      'internal' => TRUE,
+      'load' => TRUE,
+    ),
+    'dragresizetable' => array(
+      'path' => $editor['library path'] . '/editor/plugins',
+      'extensions' => array(
+        'dragresizetable' => t('Table drag/resize'),
+      ),
+      'internal' => TRUE,
+      'load' => TRUE,
+    ),
+    'tablecommands' => array(
+      'path' => $editor['library path'] . '/editor/plugins',
+      'buttons' => array(
+        'TableCellProp' => t('Table: Cell properties'),
+        'TableInsertRowAfter' => t('Table: Insert row after'),
+        'TableInsertColumnAfter' => t('Table: Insert column after'),
+        'TableInsertCellAfter' => t('Table: Insert cell after'),
+        'TableDeleteRows' => t('Table: Delete rows'),
+        'TableDeleteColumns' => t('Table: Delete columns'),
+        'TableDeleteCells' => t('Table: Delete cells'),
+        'TableMergeCells' => t('Table: Merge cells'),
+        'TableHorizontalSplitCell' => t('Table: Horizontal split cell'),
+      ),
+      'internal' => TRUE,
+      'load' => TRUE,
+    ),
   );
+  return $plugins;
 }
 

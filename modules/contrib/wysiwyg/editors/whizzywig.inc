@@ -1,17 +1,19 @@
 <?php
-// $Id: whizzywig.inc,v 1.1 2008/11/17 00:06:33 sun Exp $
+// $Id: whizzywig.inc,v 1.3 2009/06/09 00:18:12 sun Exp $
 
+/**
+ * @file
+ * Editor integration functions for Whizzywig.
+ */
 
 /**
  * Plugin implementation of hook_editor().
  */
 function wysiwyg_whizzywig_editor() {
-  $editor = array();
   $editor['whizzywig'] = array(
     'title' => 'Whizzywig',
     'vendor url' => 'http://www.unverse.net',
     'download url' => 'http://www.unverse.net/whizzywig-download.html',
-    'library path' => wysiwyg_get_path('whizzywig'),
     'libraries' => array(
       '' => array(
         'title' => 'Default',
@@ -40,13 +42,14 @@ function wysiwyg_whizzywig_editor() {
  *   The installed editor version.
  */
 function wysiwyg_whizzywig_version($editor) {
-  $script = wysiwyg_get_path('whizzywig') . '/whizzywig.js';
+  $script = $editor['library path'] . '/whizzywig.js';
   $script = fopen($script, 'r');
   $line = fgets($script, 43);
   if (preg_match('@Whizzywig v([0-9]+)@', $line, $version)) {
     fclose($script);
     return $version[1];
   }
+  fclose($script);
 }
 
 /**
@@ -67,8 +70,8 @@ function wysiwyg_whizzywig_settings($editor, $config, $theme) {
   $settings = array();
 
   // Add path to button images, if available.
-  if (is_dir(wysiwyg_get_path('whizzywig') . '/btn')) {
-    $settings['buttonPath'] = wysiwyg_get_path('whizzywig', TRUE) . '/btn/';
+  if (is_dir($editor['library path'] . '/btn')) {
+    $settings['buttonPath'] = base_path() . $editor['library path'] . '/btn/';
   }
 
   // Add configured buttons or all available.
@@ -86,7 +89,7 @@ function wysiwyg_whizzywig_settings($editor, $config, $theme) {
   // Add editor content stylesheet.
   if (isset($config['css_setting'])) {
     if ($config['css_setting'] == 'theme') {
-      $css = path_to_theme() .'/style.css';
+      $css = path_to_theme() . '/style.css';
       if (file_exists($css)) {
         $settings['externalCSS'] = base_path() . $css;
       }
@@ -100,7 +103,7 @@ function wysiwyg_whizzywig_settings($editor, $config, $theme) {
 }
 
 /**
- * Return internal plugins for Whizzywig; semi-implementation of hook_wysiwyg_plugin().
+ * Return internal plugins for this editor; semi-implementation of hook_wysiwyg_plugin().
  */
 function wysiwyg_whizzywig_plugins($editor) {
   return array(

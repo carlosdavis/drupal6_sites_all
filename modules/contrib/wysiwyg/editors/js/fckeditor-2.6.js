@@ -1,4 +1,4 @@
-// $Id: fckeditor-2.6.js,v 1.15 2009/03/26 22:31:40 sun Exp $
+// $Id: fckeditor-2.6.js,v 1.16 2009/06/04 00:53:10 sun Exp $
 
 /**
  * Attach this editor to a target element.
@@ -7,11 +7,8 @@ Drupal.wysiwyg.editor.attach.fckeditor = function(context, params, settings) {
   var FCKinstance = new FCKeditor(params.field, settings.Width, settings.Height, settings.ToolbarSet);
   // Apply editor instance settings.
   FCKinstance.BasePath = settings.EditorPath;
-  // Apply 'Wysiwyg' toolbar, if defined.
-  if (settings.CustomConfigurationsPath) {
-    FCKinstance.Config.wysiwygFormat = params.format;
-    FCKinstance.Config.CustomConfigurationsPath = settings.CustomConfigurationsPath;
-  }
+  FCKinstance.Config.wysiwygFormat = params.format;
+  FCKinstance.Config.CustomConfigurationsPath = settings.CustomConfigurationsPath;
 
   // Load Drupal plugins and apply format specific settings.
   // @see fckeditor.config.js
@@ -47,6 +44,11 @@ Drupal.wysiwyg.editor.detach.fckeditor = function(context, params) {
 
 Drupal.wysiwyg.editor.instance.fckeditor = {
   init: function(instance) {
+    // Track which editor instance is active.
+    instance.FCK.Events.AttachEvent('OnFocus', function(editorInstance) {
+      Drupal.wysiwyg.activeId = editorInstance.Name;
+    });
+
     // Create a custom data processor to wrap the default one and allow Drupal
     // plugins modify the editor contents.
     var wysiwygDataProcessor = function() {};

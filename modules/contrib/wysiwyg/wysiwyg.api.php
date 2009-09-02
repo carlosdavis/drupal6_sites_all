@@ -1,5 +1,5 @@
 <?php
-// $Id: wysiwyg.api.php,v 1.2 2008/10/29 12:20:20 sun Exp $
+// $Id: wysiwyg.api.php,v 1.3 2009/06/09 00:18:11 sun Exp $
 
 /**
  * hook_wysiwyg_plugin(). Return an array of editor plugins.
@@ -23,9 +23,10 @@
  *   tinyMCE.importCSS(inst.getDoc(), this.baseURL + '/myplugin.css');
  * },
  * @endcode
- * 
+ *
  * @param string $editor
  *   An (lowercase) editor name to return plugins for.
+ *
  * @return array
  *   An associative array having internal plugin names as keys, an array of
  *   plugin meta-information as values:
@@ -46,14 +47,14 @@ function hook_wysiwyg_plugin($editor) {
     case 'tinymce':
       return array(
         'myplugin' => array(
-          'type'        => 'external',
-          'title'       => t('My plugin title'),
+          'type' => 'external',
+          'title' => t('My plugin title'),
           'description' => t('My plugin title'),
           // Regular callback URL for external TinyMCE plugins.
-          'path'        => drupal_get_path('module', 'mymodule') .'/myplugin',
+          'path' => drupal_get_path('module', 'mymodule') . '/myplugin',
           // Wysiwyg wrapper plugin AJAX callback.
-          'callback'    => url('myplugin/browse'),
-          'icon'        => drupal_get_path('module', 'mymodule') .'/myplugin/myplugin.png',
+          'callback' => url('myplugin/browse'),
+          'icon' => drupal_get_path('module', 'mymodule') . '/myplugin/myplugin.png',
           'extended_valid_elements' => array('tag[attribute1|attribute2=default_value]'),
           // Might need to be set later on; after retrieving customized editor
           // layout.

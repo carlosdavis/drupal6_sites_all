@@ -1,17 +1,19 @@
 <?php
-// $Id: nicedit.inc,v 1.4 2008/12/05 15:35:23 sun Exp $
+// $Id: nicedit.inc,v 1.6 2009/06/09 00:18:12 sun Exp $
 
+/**
+ * @file
+ * Editor integration functions for NicEdit.
+ */
 
 /**
  * Plugin implementation of hook_editor().
  */
 function wysiwyg_nicedit_editor() {
-  $editor = array();
   $editor['nicedit'] = array(
     'title' => 'NicEdit',
     'vendor url' => 'http://nicedit.com',
     'download url' => 'http://nicedit.com/download.php',
-    'library path' => wysiwyg_get_path('nicedit'),
     'libraries' => array(
       '' => array(
         'title' => 'Source',
@@ -60,7 +62,7 @@ function wysiwyg_nicedit_version($editor) {
  */
 function wysiwyg_nicedit_settings($editor, $config, $theme) {
   $settings = array(
-    'iconsPath' => wysiwyg_get_path('nicedit', TRUE) . '/nicEditorIcons.gif',
+    'iconsPath' => base_path() . $editor['library path'] . '/nicEditorIcons.gif',
   );
 
   // Add configured buttons or all available.
@@ -78,7 +80,7 @@ function wysiwyg_nicedit_settings($editor, $config, $theme) {
   // Add editor content stylesheet.
   if (isset($config['css_setting'])) {
     if ($config['css_setting'] == 'theme') {
-      $css = path_to_theme() .'/style.css';
+      $css = path_to_theme() . '/style.css';
       if (file_exists($css)) {
         $settings['externalCSS'] = base_path() . $css;
       }
@@ -92,12 +94,11 @@ function wysiwyg_nicedit_settings($editor, $config, $theme) {
 }
 
 /**
- * Return internal plugins for nicEdit; semi-implementation of hook_wysiwyg_plugin().
+ * Return internal plugins for this editor; semi-implementation of hook_wysiwyg_plugin().
  */
 function wysiwyg_nicedit_plugins($editor) {
   return array(
     'default' => array(
-      #'path' => $editor['library path'] .'/themes/advanced',
       'buttons' => array(
         'bold' => t('Bold'), 'italic' => t('Italic'), 'underline' => t('Underline'),
         'strikethrough' => t('Strike-through'),
