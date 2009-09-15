@@ -58,8 +58,7 @@
 
 /** headings **/
 
-	h1, h2, h3, h4, h5, h6 { color: #555; 
-	    font-family: Georgia, "Times New Roman", Times, "Bitstream Vera Serif", serif;
+	h1, h2, h3, h4, h5, h6 { color: #666; 
 	    font-weight: normal; 
 	}
 
@@ -181,17 +180,17 @@
   a, a:link, a:visited, a:active
   {
   	text-decoration: none; 
-  	color: #112299; 
+  	color: #5588BB; 
   }
 
   a:hover,
   a:focus
   {
-  	text-decoration: underline; color: #3344CC; 
+  	text-decoration: underline; color: #336699; 
   }
 
 	a:active {
-		color: #112299; 
+		color: #5588BB; 
 	}
 
 /** tables **/
