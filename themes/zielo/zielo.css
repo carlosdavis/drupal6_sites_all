@@ -80,8 +80,8 @@
   h1#site-name, div#site-name /* The name of the website */
   {
   	font-size: 4em; line-height: 1em; font-weight: bold; 
-  	letter-spacing: 1px; 
-  	margin: 0.5em 0 0; padding: 0; 
+  	letter-spacing: 2px; 
+  	margin: 0.5em 0; padding: 0; 
   }
 
   #site-name a:link,
@@ -93,9 +93,12 @@
 
   #site-slogan /* The slogan (or tagline) of a website */
   {
-  	font-size: 1.4em; 
+  	font-size: 2em; 
   	font-weight: normal; 
-  	margin: 0; padding: 0;
+  	text-transform: uppercase; 
+  	margin: 0.25em 0; 
+  	padding: 0;
+  	color: #888;
   }
 
   #header-blocks /* Wrapper for any blocks placed in the header region */
