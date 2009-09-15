@@ -180,17 +180,17 @@
   a, a:link, a:visited, a:active
   {
   	text-decoration: none; 
-  	color: #5588BB; 
+  	color: #40A7DA; 
   }
 
   a:hover,
   a:focus
   {
-  	text-decoration: underline; color: #336699; 
+  	text-decoration: underline; color: #1077AA; 
   }
 
 	a:active {
-		color: #5588BB; 
+		color: #40A7DA; 
 	}
 
 /** tables **/
