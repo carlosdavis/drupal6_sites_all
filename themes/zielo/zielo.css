@@ -81,7 +81,7 @@
   {
   	font-size: 4em; line-height: 1em; font-weight: bold; 
   	letter-spacing: 2px; 
-  	margin: 0.5em 0; padding: 0; 
+  	margin: 0.5em 0 0.25em; padding: 0; 
   }
 
   #site-name a:link,
@@ -93,12 +93,12 @@
 
   #site-slogan /* The slogan (or tagline) of a website */
   {
-  	font-size: 2em; 
+  	font-size: 1.8em; 
   	font-weight: normal; 
   	text-transform: uppercase; 
-  	margin: 0.25em 0; 
+  	margin: 0.25em 0 0.5em; 
   	padding: 0;
-  	color: #888;
+  	color: #999;
   }
 
   #header-blocks /* Wrapper for any blocks placed in the header region */
