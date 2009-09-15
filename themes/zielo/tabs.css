@@ -1,0 +1,124 @@
+/* $Id: tabs.css,v 1.2 2008/09/08 02:35:29 johnalbin Exp $ */
+
+/*
+ * Tabs CSS
+ *
+ * Adds styles for the primary and secondary tabs.
+ *
+ * Compare this with default CSS found in the system module's stylesheet (a copy
+ * of which is in drupal6-reference.css, line 510.)
+ *
+ */
+
+  div.tabs
+  {
+    margin: 0 0 5px 0;
+  }
+
+  ul.primary
+  {
+    list-style: none;
+    white-space: nowrap;
+    line-height: normal;
+	background: none; 
+	height: 24px; 
+	border-bottom: 1px solid #CCC; 
+	margin-bottom: 1em; 
+	padding: 0 0 0 0.5em; 
+	font-size: 0.9em; 
+	clear: both; 
+    
+  }
+
+  ul.primary li
+  {
+		margin: 0 1em 0 0;
+		float: left;  
+  }
+
+  ul.primary li a
+  {
+	margin: 0; background: none; background-image: none; 
+	padding: 0 0.5em; display: block; 
+	height: 24px; line-height: 24px; 
+	border-style: solid; border-color: #CCC; 
+	border-width: 1px 1px 0; 	
+	color: #666;   
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  ul.primary li a .tab
+  {
+  }
+
+  ul.primary li a:hover
+  {
+	color: #0066CC; 
+	background: #EEEEEE; 
+  }
+
+  ul.primary li a:hover .tab
+  {
+  }
+
+  ul.primary li.active a,
+  ul.primary li.active a:hover
+  {
+  	border-width: 1px 1px 0; 
+    color: #444;
+	background: #FFF; 
+  }
+
+  ul.primary li.active a .tab,
+  ul.primary li.active a:hover .tab
+  {
+  }
+
+  ul.secondary
+  {
+    margin: 0 0 1em;
+    padding: 0 0 0 0.5em;
+    border-bottom: 1px solid #DDD;
+    list-style: none;
+    white-space: nowrap;
+    font-size: 0.9em; 
+  }
+
+  ul.secondary li
+  {
+    float: left;
+    margin: 0 1em 0.5em 0;
+    padding: 0; 
+    border-right: none;
+  }
+
+  ul.secondary a
+  {
+    display: block;
+    height: 24px; line-height: 24px; 
+    margin: 0;
+    padding: 0 0.5em;
+    border: 1px solid #DDD;
+    text-decoration: none;
+    color: #777;
+  }
+
+  ul.secondary a .tab
+  {
+  }
+
+  ul.secondary a:hover
+  {
+	background: #EEE; 
+	border-color: #777; 
+	color: #0066CC; 
+  }
+
+  ul.secondary a.active,
+  ul.secondary a.active:hover
+  {
+    border: 1px solid #DDD;
+    color: #444;
+    background: #EEE; 
+  }
