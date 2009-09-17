@@ -161,7 +161,7 @@
 
             <?php if ($title): ?>
 	            <?php if ($is_front): ?>
-	            	<h2 class="title"><?php print $title; ?></h1>
+	            	<h2 class="title"><?php print $title; ?></h2>
 	            <?php else: ?>
 	            	<h1 class="title"><?php print $title; ?></h1>
 	            <?php endif; ?>            
