@@ -1,5 +1,5 @@
 <?php
-// $Id: invisimail.module,v 1.3.4.8 2009/06/29 22:19:44 crell Exp $
+// $Id: invisimail.module,v 1.3.4.10 2009/08/25 21:59:47 crell Exp $
 
 define('INVISIMAIL_MAILTO_ASCII', '&#109;&#97;&#105;&#108;&#116;&#111;&#58;');
 
@@ -34,7 +34,7 @@ function invisimail_menu() {
     $items['admin/settings/invisimail'] = array(
       'title' => t('Invisimail formatter'),
       'page callback' => 'drupal_get_form',
-      'page arguments' => array('invismail_formatter_settings'),
+      'page arguments' => array('invisimail_formatter_settings'),
       'access arguments' => array('administer invisimail formatter'),
       'type' => MENU_NORMAL_ITEM,
     );
@@ -275,7 +275,7 @@ function theme_invisimail_formatter_invisimail($element) {
   }
 
   if (module_exists('invisimail')) {
-    return invisimail_ascii_encode($element['#item']['email'], variable_get('invisimail_js_formatter', FALSE), variable_get('invisimail_link_formatter', FALSE));
+    return invisimail_ascii_encode($element['#item']['email'], variable_get('invisimail_js_formatter', 0), variable_get('invisimail_link_formatter', 0));
   }
   else {
     return '<a href="mailto:'. $element['#item']['email'] .'">'. check_plain($element['#item']['email']) .'</a>';
@@ -302,16 +302,16 @@ function _invisimail_settings($format) {
   $form['invisimail_js_'.$format] = array(
     '#type' => 'radios',
     '#title' => t('JavaScript'),
-    '#default_value' => variable_get('invisimail_js_'.$format, FALSE),
-    '#options' => array(FALSE => t('No JavaScript - greater compatibility'), TRUE => t('Use JavaScript - greater security')),
+    '#default_value' => variable_get('invisimail_js_'.$format, 0),
+    '#options' => array(0 => t('No JavaScript - greater compatibility'), 1 => t('Use JavaScript - greater security')),
     '#description' => t('Selecting "Use JavaScript" will nearly guarantee protection from spam harvesters. However email addresses will not appear for browsers without JavaScript capability.'),
   );
 
   $form['invisimail_link_'.$format] = array(
     '#type' => 'radios',
     '#title' => t('Auto-link Emails'),
-    '#default_value' => variable_get('invisimail_link_'.$format, FALSE),
-    '#options' => array(FALSE => t('Do not create links.'), TRUE => t('Automatically create links from email addresses.')),
+    '#default_value' => variable_get('invisimail_link_'.$format, 0),
+    '#options' => array(0 => t('Do not create links.'), 1 => t('Automatically create links from email addresses.')),
     '#description' => t('Selecting "Automatically create links" will convert email addresses into a clickable "mailto:" link.'),
   );
 
