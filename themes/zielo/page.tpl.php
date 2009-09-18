@@ -206,11 +206,11 @@
       <div id="footer"><div id="footer-inner" class="region region-footer">
 	    <?php if ($footer or $footer_message): ?>
 	
+          <?php print $footer; ?>
+
 	        <?php if ($footer_message): ?>
 	          <div id="footer-message"><?php print $footer_message; ?></div>
 	        <?php endif; ?>
-	
-	        <?php print $footer; ?>
 	
 	    <?php endif; ?>
       </div></div> <!-- /#footer-inner, /#footer -->
