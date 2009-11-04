@@ -3,9 +3,9 @@ name = External Links
 description = Adds icon next to external links on the site.
 package = User interface
 core = 6.x
-; Information added by drupal.org packaging script on 2009-03-14
-version = "6.x-1.7"
+; Information added by drupal.org packaging script on 2009-10-23
+version = "6.x-1.8"
 core = "6.x"
 project = "extlink"
-datestamp = "1237010120"
+datestamp = "1256274322"
 

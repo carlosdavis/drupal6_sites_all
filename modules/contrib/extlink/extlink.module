@@ -1,5 +1,5 @@
 <?php
-// $Id: extlink.module,v 1.3.2.4 2009/03/14 05:12:14 quicksketch Exp $
+// $Id: extlink.module,v 1.3.2.5 2009/07/04 00:10:53 quicksketch Exp $
 
 function extlink_menu() {
   $items = array();
@@ -116,6 +116,7 @@ function extlink_admin_settings() {
   $form['patterns']['extlink_exclude'] = array(
     '#type' => 'textfield',
     '#title' => t('Exclude links matching the pattern'),
+    '#maxlength' => NULL,
     '#default_value' => variable_get('extlink_exclude', ''),
     '#description' => t('Enter a regular expression for links that you wish to exclude from being considered external.'),
   );
@@ -123,6 +124,7 @@ function extlink_admin_settings() {
   $form['patterns']['extlink_include'] = array(
     '#type' => 'textfield',
     '#title' => t('Include links matching the pattern'),
+    '#maxlength' => NULL,
     '#default_value' => variable_get('extlink_include', ''),
     '#description' => t('Enter a regular expression for internal links that you wish to be considered external.'),
   );

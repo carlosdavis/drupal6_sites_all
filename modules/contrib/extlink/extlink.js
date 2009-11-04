@@ -37,7 +37,7 @@ function extlinkAttach(context) {
   // available in jQuery 1.0 (Drupal 5 default).
   var external_links = new Array();
   var mailto_links = new Array();
-  $("a", context).each(function(el) {
+  $("a:not(." + Drupal.settings.extlink.extClass + ", ." + Drupal.settings.extlink.mailtoClass + ")", context).each(function(el) {
     try {
       var url = this.href.toLowerCase();
       if (url.indexOf('http') == 0 && (!url.match(internal_link) || (extInclude && url.match(extInclude))) && !(extExclude && url.match(extExclude))) {

@@ -29,7 +29,7 @@ msgstr "Positionner l'icône à côté des liens externes."
 
 #: extlink.module:40
 msgid "Open external links in a new window"
-msgstr Ouvre les liens externes dans une nouvelle fenêtre"
+msgstr "Ouvre les liens externes dans une nouvelle fenêtre"
 
 #: extlink.module:43
 msgid "Should all external links be opened in a new window?"
