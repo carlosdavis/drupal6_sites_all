@@ -2,9 +2,9 @@
 name = Thickbox
 description = Enables Thickbox, a jQuery plugin.
 core = 6.x
-; Information added by drupal.org packaging script on 2009-05-18
-version = "6.x-1.4"
+; Information added by drupal.org packaging script on 2009-09-07
+version = "6.x-1.5"
 core = "6.x"
 project = "thickbox"
-datestamp = "1242639099"
+datestamp = "1252344372"
 
