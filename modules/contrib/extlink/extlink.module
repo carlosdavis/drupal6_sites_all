@@ -1,11 +1,11 @@
 <?php
-// $Id: extlink.module,v 1.3.2.5 2009/07/04 00:10:53 quicksketch Exp $
+// $Id: extlink.module,v 1.3.2.6 2009/12/20 00:20:25 quicksketch Exp $
 
 function extlink_menu() {
   $items = array();
   $items['admin/settings/extlink'] = array(
-    'title' => t('External links'),
-    'description' => t('Alter the display of external links on the site.'),
+    'title' => 'External links',
+    'description' => 'Alter the display of external links on the site.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('extlink_admin_settings'),
     'access callback' => 'user_access',
@@ -31,7 +31,7 @@ function extlink_init() {
     'mailtoClass'   => variable_get('extlink_mailto_class', 'mailto'))), 'setting'
   );
   if (variable_get('extlink_class', 'ext') == 'ext' || variable_get('extlink_mailto_class', 'mailto') == 'mailto') {
-    drupal_add_css($path .'/extlink.css');
+    drupal_add_css($path . '/extlink.css');
   }
 }
 

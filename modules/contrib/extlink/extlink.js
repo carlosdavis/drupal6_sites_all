@@ -1,3 +1,6 @@
+// $Id: extlink.js,v 1.4.2.9 2009/12/20 00:20:25 quicksketch Exp $
+(function ($) {
+
 function extlinkAttach(context) {
   // Strip the host name down, removing subdomains or www.
   var host = window.location.host.replace(/^(([^\/]+?\.)*)([^\.]{4,})((\.[a-z]{1,4})*)$/, '$3$4');
@@ -5,13 +8,13 @@ function extlinkAttach(context) {
 
   // Determine what subdomains are considered internal.
   if (Drupal.settings.extlink.extSubdomains) {
-    var subdomains = "([^/]*)?";
+    var subdomains = "([^/]*\\.)?";
   }
   else if (subdomain == 'www.' || subdomain == '') {
-    var subdomains = "(www\.)?";
+    var subdomains = "(www\\.)?";
   }
   else {
-    var subdomains = subdomain.replace(".", "\.");
+    var subdomains = subdomain.replace(".", "\\.");
   }
 
   // Build regular expressions that define an internal link.
@@ -89,6 +92,8 @@ function extlinkAttach(context) {
 
 }
 
-Drupal.behaviors.extlink = function(context){
+Drupal.behaviors.extlink = function(context) {
   extlinkAttach(context);
 }
+
+})(jQuery);
