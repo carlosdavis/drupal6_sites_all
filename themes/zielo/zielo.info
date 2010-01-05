@@ -86,8 +86,8 @@ settings[zen_rebuild_registry]     = 0
 settings[zen_wireframes]           = 0
 
 ; Information added by drupal.org packaging script on 2008-09-15
-version = "6.x-1.0-beta3"
+version = "6.x-1.0"
 core = "6.x"
-project = "zen"
+project = "zielo"
 datestamp = "1221475935"
 
