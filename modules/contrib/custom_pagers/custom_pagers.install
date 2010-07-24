@@ -1,5 +1,10 @@
 <?php
-// $Id: custom_pagers.install,v 1.3 2008/06/17 20:47:05 eaton Exp $
+// $Id: custom_pagers.install,v 1.3.2.4 2010/01/17 22:14:21 eaton Exp $
+
+/**
+ * @file
+ * Custom pagers install file.
+ */
 
 /**
  * Implementation of hook_install().
@@ -10,74 +15,67 @@ function custom_pagers_install() {
 
 function custom_pagers_schema() {
   $schema['custom_pager'] = array(
-    'description' => t('Stores data for previous/next pagers to be added to nodes.'),
+    'description' => 'Stores data for previous/next pagers to be added to nodes.',
     'fields' => array(
       'pid' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => t('Unique identifier for the {custom_pager}.'),
+        'description' => 'Unique identifier for the {custom_pager}.',
       ),
       'title' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => t("The visible title of the {custom_pager}.")
+        'description' => 'The visible title of the {custom_pager}.',
       ),
       'list_php' => array(
         'type' => 'text',
         'not null' => FALSE,
         'size' => 'big',
-        'description' => t('Raw PHP to populate this {custom_pager}.'),
+        'description' => 'Raw PHP to populate this {custom_pager}.',
       ),
       'view' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => t("The name of the view used for this {custom_pager}.")
+        'description' => 'The name of the view used for this {custom_pager}.',
       ),
       'args' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => t("A serialized array of arguments for the {custom_pager}'s view.")
+        'description' => "A serialized array of arguments for the {custom_pager}'s view.",
       ),
       'position' => array(
         'type' => 'varchar',
         'length' => 16,
         'not null' => TRUE,
         'default' => '',
-        'description' => t("The position where this {custom_pager} should be displayed.")
+        'description' => 'The position where this {custom_pager} should be displayed.',
       ),
       'visibility_php' => array(
         'type' => 'text',
         'not null' => FALSE,
         'size' => 'big',
-        'description' => t('Raw PHP to determine when the {custom_pager} should be displayed.'),
+        'description' => 'Raw PHP to determine when the {custom_pager} should be displayed.',
       ),
       'node_type' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => t("A specific node type this {custom_pager} should be displayed with.")
+        'description' => 'A specific node type this {custom_pager} should be displayed with.',
       ),
       'reverse_list' => array(
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
         'size' => 'tiny',
-        'description' => t("A boolean flag indicating that this {custom_pager} should be displayed in reverse order.")
-      ),
-      'cache_list' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'tiny',
-        'description' => t("A boolean flag indicating that this {custom_pager}'s list of nodes should be cached.")
+        'description' => 'A boolean flag indicating that this {custom_pager} should be displayed in reverse order.',
       ),
     ),
     'primary key' => array('pid'),
@@ -88,33 +86,47 @@ function custom_pagers_schema() {
 
 function custom_pagers_update_1() {
   $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {custom_pager} ADD list_php text");
-      $ret[] = update_sql("ALTER TABLE {custom_pager} ADD visibility_php text");
-      break;
-    case 'pgsql':
-      db_add_column($ret, 'custom_pager', 'list_php', 'text', array('default' => ''));
-      db_add_column($ret, 'custom_pager', 'visibility_php', 'text', array('default' => ''));
-      break;
-  }
+  db_add_field($ret, 'custom_pager', 'list_php', array(
+    'type' => 'text',
+    'not null' => FALSE,
+    'size' => 'big',
+    'description' => 'Raw PHP to populate this {custom_pager}.',
+  ));
+  db_add_field($ret, 'custom_pager', 'visibility_php', array(
+    'type' => 'text',
+    'not null' => FALSE,
+    'size' => 'big',
+    'description' => 'Raw PHP to determine when the {custom_pager} should be displayed.',
+  ));
   return $ret;
 }
 
 function custom_pagers_update_2() {
   $ret = array();
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {custom_pager} ADD cache_list tinyint NOT NULL default 0");
-      $ret[] = update_sql("ALTER TABLE {custom_pager} ADD reverse_list tinyint NOT NULL default 0");
-      break;
-    case 'pgsql':
-      db_add_column($ret, 'custom_pager', 'cache_list', 'smallint', array('not null' => TRUE, 'default' => 0));
-      db_add_column($ret, 'custom_pager', 'reverse_list', 'smallint', array('not null' => TRUE, 'default' => 0));
-      break;
-  }
+  db_add_field($ret, 'custom_pager', 'cache_list', array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+    'size' => 'tiny',
+    'description' => "A boolean flag indicating that this {custom_pager}'s list of nodes should be cached.",
+  ));
+  db_add_field($ret, 'custom_pager', 'reverse_list', array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+    'size' => 'tiny',
+    'description' => 'A boolean flag indicating that this {custom_pager} should be displayed in reverse order.',
+  ));
+  return $ret;
+}
+
+
+/**
+ * Kill the cache flag as it's not actually that helpful.
+ */
+function custom_pagers_update_6104() {
+  $ret = array();
+  db_drop_field($ret, 'custom_pager', 'cache_list');
   return $ret;
 }
 

@@ -1,5 +1,5 @@
 <?php
-// $Id: extlink.module,v 1.3.2.6 2009/12/20 00:20:25 quicksketch Exp $
+// $Id: extlink.module,v 1.3.2.8 2010/05/26 01:23:47 quicksketch Exp $
 
 function extlink_menu() {
   $items = array();
@@ -19,17 +19,23 @@ function extlink_menu() {
  */
 function extlink_init() {
   $path = drupal_get_path('module', 'extlink');
-  drupal_add_js($path .'/extlink.js');
-  drupal_add_js(array('extlink' => array(
+  $settings = array(
     'extTarget'     => variable_get('extlink_target', 0),
     'extClass'      => variable_get('extlink_class', 'ext'),
     'extSubdomains' => variable_get('extlink_subdomains', 1),
     'extExclude'    => variable_get('extlink_exclude', ''),
     'extInclude'    => variable_get('extlink_include', ''),
     'extAlert'      => variable_get('extlink_alert', 0),
-    'extAlertText'  => variable_get('extlink_alert_text', 'This link will take you to an external web site. We are not responsible for their content.'),
-    'mailtoClass'   => variable_get('extlink_mailto_class', 'mailto'))), 'setting'
+    'extAlertText'  => variable_get('extlink_alert_text', NULL),
+    'mailtoClass'   => variable_get('extlink_mailto_class', 'mailto'),
   );
+  // The default alert text must be translated separately to avoid caching.
+  if ($settings['extAlertText'] === NULL) {
+    $settings['extAlertText'] = t('This link will take you to an external web site. We are not responsible for their content.');
+  }
+
+  drupal_add_js($path . '/extlink.js');
+  drupal_add_js(array('extlink' => $settings), 'setting');
   if (variable_get('extlink_class', 'ext') == 'ext' || variable_get('extlink_mailto_class', 'mailto') == 'mailto') {
     drupal_add_css($path . '/extlink.css');
   }
@@ -77,12 +83,18 @@ function extlink_admin_settings() {
     '#description' => t('Displays a pop-up warning when any external link is clicked.'),
   );
 
+  // The default alert text must be translated separately to avoid caching.
+  $extlink_alert_text = variable_get('extlink_alert_text', NULL);
+  if ($extlink_alert_text === NULL) {
+    $extlink_alert_text = t('This link will take you to an external web site. We are not responsible for their content.');
+  }
   $form['extlink_alert_text'] = array(
     '#type' => 'textarea',
     '#rows' => 3,
     '#title' => t('Pop-up warning text'),
-    '#default_value' => variable_get('extlink_alert_text', 'This link will take you to an external web site. We are not responsible for their content.'),
+    '#default_value' => $extlink_alert_text,
     '#description' => t('Text to display in the pop-up external link warning box.'),
+    '#wysiwyg' => FALSE,
   );
 
   $patterns = array(

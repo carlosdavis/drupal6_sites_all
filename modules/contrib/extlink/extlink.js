@@ -1,10 +1,11 @@
-// $Id: extlink.js,v 1.4.2.9 2009/12/20 00:20:25 quicksketch Exp $
+// $Id: extlink.js,v 1.4.2.12 2010/05/26 01:25:56 quicksketch Exp $
 (function ($) {
 
 function extlinkAttach(context) {
-  // Strip the host name down, removing subdomains or www.
-  var host = window.location.host.replace(/^(([^\/]+?\.)*)([^\.]{4,})((\.[a-z]{1,4})*)$/, '$3$4');
-  var subdomain = window.location.host.replace(/^(([^\/]+?\.)*)([^\.]{4,})((\.[a-z]{1,4})*)$/, '$1');
+  // Strip the host name down, removing ports, subdomains, or www.
+  var pattern = /^(([^\/:]+?\.)*)([^\.:]{4,})((\.[a-z]{1,4})*)(:[0-9]{1,5})?$/;
+  var host = window.location.host.replace(pattern, '$3$4');
+  var subdomain = window.location.host.replace(pattern, '$1');
 
   // Determine what subdomains are considered internal.
   if (Drupal.settings.extlink.extSubdomains) {
@@ -90,6 +91,10 @@ function extlinkAttach(context) {
     });
   }
 
+  // Work around for Internet Explorer box model problems.
+  if (($.support && !($.support.boxModel === undefined) && !$.support.boxModel) || ($.browser.msie && parseInt($.browser.version) <= 7)) {
+    $('span.ext, span.mailto').css('display', 'inline-block');
+  }
 }
 
 Drupal.behaviors.extlink = function(context) {

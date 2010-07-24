@@ -1,5 +1,10 @@
 <?php
-// $Id: custom_pagers.admin.inc,v 1.1 2008/06/17 20:47:05 eaton Exp $
+// $Id: custom_pagers.admin.inc,v 1.1.2.3 2010/01/17 22:57:39 eaton Exp $
+
+/**
+ * @file
+ * Admin functionality for the custom pagers module.
+ */
 
 // Lists all current custom pagers, and provides a link to the edit page.
 function custom_pagers_page() {
@@ -11,8 +16,8 @@ function custom_pagers_page() {
   foreach ($pagers as $pager) {
     $row = array();
     $row[] = $pager->title;
-    $row[] = !empty($pager->list_php) ? t('PHP snippet') : $pager->view . t(' view');
-    $row[] = !empty($pager->visibility_php) ? t('PHP snippet') : $pager->node_type . t(' nodes');
+    $row[] = !empty($pager->list_php) ? t('PHP snippet') : t('%view_name view', array('%view_name' => $pager->view));
+    $row[] = !empty($pager->visibility_php) ? t('PHP snippet') : t('%node_type nodes', array('%node_type' => $pager->node_type));
     $row[] =  l(t('edit'), 'admin/build/custom_pagers/edit/' . $pager->pid);
     $rows[] = $row;
   }
@@ -21,7 +26,6 @@ function custom_pagers_page() {
   }
 
   $rows[] = array(array('data' => l(t('Add a new custom pager'), 'admin/build/custom_pagers/add'), 'colspan' => 2));
-
 
   return theme('table', $header, $rows);
 }
@@ -67,7 +71,7 @@ function custom_pagers_form(&$form_state, $pid = NULL) {
   );
 
   // Warn the user they're about to override custom code.
-  if ((!empty($pager->visibility_php)) && !user_access('use php in custom pagers')){
+  if ((!empty($pager->visibility_php)) && !user_access('use php in custom pagers')) {
     $form['visibility']['php'] = array(
       '#type' => 'item',
       '#title' => t('Note'),
@@ -110,7 +114,7 @@ function custom_pagers_form(&$form_state, $pid = NULL) {
         '#value' => t('This pager uses custom PHP snippets to generate a list of nodes. You do not have permission to use PHP snippets, and the changes you make to this field will be ignored.'),
       );
     }
-    elseif (!module_exists('views')){
+    elseif (!module_exists('views')) {
       $form['node_list']['warning'] = array(
         '#type' => 'item',
         '#title' => t('Warning'),
@@ -181,13 +185,6 @@ function custom_pagers_form(&$form_state, $pid = NULL) {
     '#return_value' => 1,
     '#description' => t("The natural list view ordering for an archive is the opposite of the natural 'previous/next' order for a pager. As such, reversing the pager list is useful when using a single view for paging and other sorted lists (pages, blocks, etc)."),
     '#default_value' => $pid ? $pager->reverse_list : NULL
-  );
-
-  $form['node_list']['cache_list'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Cache the list of nodes'),
-    '#return_value' => 1,
-    '#default_value' => $pid ? $pager->cache_list : NULL
   );
 
   $form['buttons']['submit'] = array(

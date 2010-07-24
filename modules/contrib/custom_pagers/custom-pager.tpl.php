@@ -1,8 +1,9 @@
 <?php
-// $Id: custom-pager.tpl.php,v 1.1 2008/06/17 20:47:05 eaton Exp $
+// $Id: custom-pager.tpl.php,v 1.1.2.1 2008/12/24 00:58:21 eaton Exp $
 
 /**
- * @file custom-pager.tpl.php
+ * @file
+ * custom-pager.tpl.php
  *
  * Theme implementation to display a custom pager.
  *

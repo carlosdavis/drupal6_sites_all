@@ -1,5 +1,10 @@
 <?php
-// $Id: custom_pagers.module,v 1.6 2008/06/17 21:20:32 eaton Exp $
+// $Id: custom_pagers.module,v 1.6.2.7 2010/01/17 22:08:10 eaton Exp $
+
+/**
+ * @file
+ * Allows administrators to define context-sensitive previous/next pagers for any node type.
+ */
 
 /**
  * Implementation of hook_menu().
@@ -61,9 +66,9 @@ function custom_pagers_nodeapi(&$node, $op, $teaser, $page) {
     case 'view':
       // We want to make sure we don't try to output when print.module is active.
       // It's a bit of special casing but it doesn't do much harm.
-      if ($teaser == false && empty($node->printing)) {
-        $pagers = _custom_pagers_load_all_pagers();
-        foreach ($pagers as $pager) {
+      if ($teaser == FALSE && empty($node->printing)) {
+        $node->custom_pagers = _custom_pagers_load_all_pagers();
+        foreach ($node->custom_pagers as $pager) {
           if ($pager->position != 'block' && _custom_pagers_visibility($pager, $node)) {
             $nav_array = custom_pager_build_nav($pager, $node);
             if ($nav_array['current_index'] != -1) {
@@ -89,14 +94,6 @@ function custom_pagers_nodeapi(&$node, $op, $teaser, $page) {
           $node->content['custom_pager_bottom']['#weight'] = 100;
         }
       }
-      break;
-    case 'update':
-    case 'insert':
-    case 'delete':
-      // If a user makes any changes to a node, we want to make sure that
-      // their pager cache is cleared. It's ugly, but it should prevent some
-      // of the nastier cache-went-stale issues.
-      unset($_SESSION['custom_pagers']);
       break;
   }
 }
@@ -150,7 +147,7 @@ function _custom_pagers_load_all_pagers($refresh = FALSE) {
     $result = db_query($sql);
 
     $pagers = array();
-    while($pager = db_fetch_object($result)) {
+    while ($pager = db_fetch_object($result)) {
       $pagers[$pager->pid] = $pager;
     }
   }
@@ -180,7 +177,8 @@ function _custom_pagers_visibility($pager, $node) {
     $result = eval(trim($pager->visibility_php));
     $visible = ($result == TRUE);
     ob_end_clean();
-  } elseif (!empty($pager->node_type)) {
+  }
+  elseif (!empty($pager->node_type)) {
     $visible = (strpos($pager->node_type, $node->type) !== FALSE);
   }
   return $visible;
@@ -190,33 +188,6 @@ function custom_pager_build_nav($pager, $node) {
   static $pager_cache;
   $list = array();
 
-  // First we check the static function cache for this pager.
-  // If it's already been built for this page-load, we'll use it.
-  if (isset($pager_cache[$pager->pid])) {
-    $list = explode(',', $pager_cache[$pager->pid]);
-  }
-
-  // If it doesn't give us a list, and the pager is set to cache its
-  // data, we'll try to load from the current user's session. We do it
-  // that way rather than via cache_set() because of the potential for
-  // node_access violations. Each user's node list *could* be different.
-  if (empty($list) && $pager->cache_list) {
-    if ($cache = $_SESSION['custom_pagers'][$pager->pid]) {
-      // We should probably set the pager cache lifetime to a configurable
-      // value. If any nodes drop through the cracks, users won't see the
-      // pager when they visit them. Five minutes should keep the pager from
-      // thrashing. In the future, we'll want to develop a better strategy
-      // for this.
-      if ($cache['timestamp'] < (time() - 300)) {
-        unset($_SESSION['custom_pagers'][$pager->pid]);
-      }
-      else {
-        $list = explode(',', $_SESSION['custom_pagers'][$pager->pid]['data']);
-      }
-    }
-  }
-
-  // If $list is still empty, neither caching strategy produced a list.
   // Let's build it from scratch!
   if (empty($list)) {
     // If the pager uses PHP, execute the PHP and run with the list.
@@ -230,25 +201,8 @@ function custom_pager_build_nav($pager, $node) {
       }
       ob_end_clean();
     }
-    elseif (module_exists('views') && $view = views_get_view($pager->view)) {
-      // Get arguments for the view.
-      if (isset($pager->args)) {
-        $args = explode("\n", $pager->args);
-        if (module_exists('token')) {
-          $args = token_replace($args, 'node', $node);
-        }
-        $view->set_arguments($args);
-      }
-
-      // Make sure the query is not cached
-      $view->is_cacheable = FALSE;
-      $view->execute();
-
-      if (isset($view->result)) {
-        foreach($view->result as $result) {
-          $list[] = $result->nid;
-        }
-      }
+    elseif ($results = custom_pagers_get_list_from_view($pager, $node)) {
+      $list = $results;
     }
 
     if ($pager->reverse_list) {
@@ -256,18 +210,10 @@ function custom_pager_build_nav($pager, $node) {
     }
   }
 
-  // If we get to this point, we want to cache what we've made.
-  if ($pager->cache_list) {
-    $_SESSION['custom_pagers'][$pager->pid]['data'] = implode(',', $list);
-    $_SESSION['custom_pagers'][$pager->pid]['timestamp'] = time();
-  }
-  $pager_cache[$pager->pid] = $list;
-
   return pager_entries_by_val($node->nid, $list);
 }
 
 // Helper functions to pull proper entries from a list of nids.
-
 function pager_entries_by_val($value, $list) {
   $list = array_values($list);
   foreach ($list as $k => $v) {
@@ -291,7 +237,7 @@ function pager_entries_by_key($key, $list, $increment = 1) {
     'full_list' => $list
   );
 
-  foreach($nav as $k => $v) {
+  foreach ($nav as $k => $v) {
     if ($nav[$k] == $list[$key]) {
       $nav[$k] = NULL;
     }
@@ -301,19 +247,61 @@ function pager_entries_by_key($key, $list, $increment = 1) {
   return $nav;
 }
 
-function custom_pagers_preprocess_custom_pager(&$vars) {
+function custom_pagers_get_list_from_view($pager, $node) {
+  if ($view = views_get_view($pager->view)) {
+    $display = $view->add_display('custom_pagers_simple');
+  
+    $view->set_display($display);
+    $view->display_handler->set_option('style_plugin', 'custom_pagers_php_array');
+    $view->display_handler->set_option('items_per_page', 0);
+
+    // Get arguments for the view.
+    if (!empty($pager->args)) {
+      $args = array_map('trim', explode("\n", $pager->args));
+      if (module_exists('token')) {
+        $args = token_replace($args, 'node', $node);
+      }
+    }
+    else {
+      $args = array();
+    }
+
+    // Remove the number-of-items-per-page restriction, as it will mess up
+    // our counts.
+    $view->pager['items_per_page'] = 0;
+
+    // Get the results.
+    $result = $view->execute_display($display, $args);
+  }
+  else {
+    $result = FALSE;
+  }
+  return $result;
+}
+
+function template_preprocess_custom_pager(&$vars) {
   drupal_add_css(drupal_get_path('module', 'custom_pagers') .'/custom_pagers.css');
   $node = $vars['node'];
   $pager = $vars['pager'];
   $nav = $vars['nav_array'];
 
-  $vars['previous'] = !empty($nav['prev']) ? l(t('‹ previous'), 'node/'. $nav['prev']) : '';
+  $vars['previous'] = !empty($nav['prev']) ? l('‹ ' . t('previous'), 'node/'. $nav['prev']) : '';
   $vars['key'] = t('@count of @count_total', array('@count' => ($nav['current_index'] + 1), '@count_total' => count($nav['full_list'])));
-  $vars['next'] =  !empty($nav['next']) ? l(t('next ›'), 'node/'. $nav['next']) : '';
+  $vars['next'] =  !empty($nav['next']) ? l(t('next') . ' ›', 'node/'. $nav['next']) : '';
 
-  $vars['suggestions'][] = "custom-pager-{$vars['position']}";
-  $vars['suggestions'][] = "custom-pager-$node->type";
-  $vars['suggestions'][] = "custom-pager-$node->type-{$vars['position']}";
-  $vars['suggestions'][] = "custom-pager-$pager->pid";
-  $vars['suggestions'][] = "custom-pager-$pager->pid-{$vars['position']}";
+  $vars['template_files'][] = "custom-pager-{$vars['position']}";
+  $vars['template_files'][] = "custom-pager-$node->type";
+  $vars['template_files'][] = "custom-pager-$node->type-{$vars['position']}";
+  $vars['template_files'][] = "custom-pager-$pager->pid";
+  $vars['template_files'][] = "custom-pager-$pager->pid-{$vars['position']}";
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function custom_pagers_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'custom_pagers') . '/views',
+  );
 }
