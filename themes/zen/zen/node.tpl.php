@@ -1,6 +1,4 @@
 <?php
-// $Id: node.tpl.php,v 1.4.2.1 2009/05/12 18:41:54 johnalbin Exp $
-
 /**
  * @file node.tpl.php
  *

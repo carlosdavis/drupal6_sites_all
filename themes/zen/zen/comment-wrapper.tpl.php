@@ -1,6 +1,4 @@
 <?php
-// $Id: comment-wrapper.tpl.php,v 1.2 2008/09/14 12:12:38 johnalbin Exp $
-
 /**
  * @file comment-wrapper.tpl.php
  * Default theme implementation to wrap comments.

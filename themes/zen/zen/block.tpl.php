@@ -1,6 +1,4 @@
 <?php
-// $Id: block.tpl.php,v 1.4 2008/09/14 12:41:20 johnalbin Exp $
-
 /**
  * @file block.tpl.php
  *

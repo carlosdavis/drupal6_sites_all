@@ -1,6 +1,4 @@
 <?php
-// $Id: box.tpl.php,v 1.2 2008/09/14 11:56:34 johnalbin Exp $
-
 /**
  * @file box.tpl.php
  *

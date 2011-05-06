@@ -1,6 +1,4 @@
 <?php
-// $Id: template.comment.inc,v 1.2 2008/09/14 12:09:37 johnalbin Exp $
-
 /**
  * @file
  * Contains functions only needed when rendering comments.

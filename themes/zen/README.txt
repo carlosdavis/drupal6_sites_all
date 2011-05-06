@@ -1,5 +1,3 @@
-// $Id: README.txt,v 1.11.2.5 2009/11/10 08:07:59 johnalbin Exp $
-
 Full documentation on the Zen theme can be found in Drupal's Handbook:
   http://drupal.org/node/193318
 

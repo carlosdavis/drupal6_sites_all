@@ -1,6 +1,4 @@
 <?php
-// $Id: template.block-editing.inc,v 1.1.2.3 2009/04/27 01:31:32 johnalbin Exp $
-
 /**
  * @file
  * Contains functions only needed if the user has block editing permissions.

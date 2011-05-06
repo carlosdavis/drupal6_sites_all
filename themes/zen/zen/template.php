@@ -1,6 +1,4 @@
 <?php
-// $Id: template.php,v 1.44.2.11 2009/11/05 13:11:38 johnalbin Exp $
-
 /**
  * @file
  * Contains theme override functions and preprocess functions for the Zen theme.
@@ -100,10 +98,20 @@ function zen_menu_item_link($link) {
 function zen_menu_local_tasks() {
   $output = '';
 
-  if ($primary = menu_primary_local_tasks()) {
+  // CTools requires a different set of local task functions.
+  if (module_exists('ctools')) {
+    $primary = ctools_menu_primary_local_tasks();
+    $secondary = ctools_menu_secondary_local_tasks();
+  }
+  else {
+    $primary = menu_primary_local_tasks();
+    $secondary = menu_secondary_local_tasks();
+  }
+
+  if ($primary) {
     $output .= '<ul class="tabs primary clear-block">' . $primary . '</ul>';
   }
-  if ($secondary = menu_secondary_local_tasks()) {
+  if ($secondary) {
     $output .= '<ul class="tabs secondary clear-block">' . $secondary . '</ul>';
   }
 

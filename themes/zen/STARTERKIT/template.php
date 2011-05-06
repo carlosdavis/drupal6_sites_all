@@ -1,6 +1,4 @@
 <?php
-// $Id: template.php,v 1.17.2.1 2009/02/13 06:47:44 johnalbin Exp $
-
 /**
  * @file
  * Contains theme override functions and preprocess functions for the theme.

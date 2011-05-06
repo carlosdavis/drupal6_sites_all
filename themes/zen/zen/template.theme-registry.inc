@@ -1,6 +1,4 @@
 <?php
-// $Id: template.theme-registry.inc,v 1.7.2.6 2009/10/24 11:30:15 johnalbin Exp $
-
 /**
  * @file
  * Contains infrequently used theme registry build functions.

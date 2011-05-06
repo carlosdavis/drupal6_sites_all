@@ -1,6 +1,4 @@
 <?php
-// $Id: comment.tpl.php,v 1.3 2008/09/14 12:09:37 johnalbin Exp $
-
 /**
  * @file comment.tpl.php
  * Default theme implementation for comments.

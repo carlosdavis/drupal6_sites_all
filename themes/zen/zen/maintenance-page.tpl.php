@@ -1,6 +1,4 @@
 <?php
-// $Id: maintenance-page.tpl.php,v 1.1.2.2 2009/05/03 11:12:28 johnalbin Exp $
-
 /**
  * @file maintenance-page.tpl.php
  *
